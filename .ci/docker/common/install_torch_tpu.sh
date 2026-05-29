@@ -178,7 +178,11 @@ fi
 # Using the confirmed path: requirements/requirements.txt
 # Filter out torch pins to prevent downgrading the CI build
 grep -vE "torch|torchvision|torchaudio" requirements/requirements.txt > requirements_no_torch.txt
-pip_install -r requirements_no_torch.txt
+# The requirements file is fully hash-locked, so every dependency is already
+# pinned explicitly. Use --no-deps so pip does not try to re-resolve the
+# torch* packages we just stripped out (e.g. torchvision pulled in by timm),
+# which would fail in pip's --require-hashes mode.
+pip_install --no-deps -r requirements_no_torch.txt
 rm requirements_no_torch.txt
 
 # 10. Build
